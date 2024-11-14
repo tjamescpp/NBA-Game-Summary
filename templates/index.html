@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Game Recap Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>NBA Game Recap Generator</h1>
+    <form action="/" method="post">
+        <label for="game_id">Enter Game ID:</label>
+        <input type="text" id="game_id" name="game_id" required>
+        <button type="submit">Generate Recap</button>
+    </form>
+    {% if recap %}
+        <h2>Game Recap</h2>
+        <p>{{ recap }}</p>
+    {% elif error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+</body>
+</html>
