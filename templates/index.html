@@ -8,16 +8,14 @@
 </head>
 <body>
     <h1>NBA Game Recap Generator</h1>
-    <form action="/" method="post">
-        <label for="game_id">Enter Game ID:</label>
-        <input type="text" id="game_id" name="game_id" required>
-        <button type="submit">Generate Recap</button>
-    </form>
-    {% if recap %}
-        <h2>Game Recap</h2>
-        <p>{{ recap }}</p>
-    {% elif error %}
-        <p style="color: red;">{{ error }}</p>
-    {% endif %}
+    <h2>Games</h2>
+    <ul>
+        {% for game in games %}
+            <li>
+                {{ game.away_team }} vs. {{ game.home_team }} at {{ game.game_time }}<br>
+                <a href="{{ url_for('generate_recap', game_id=game.game_id) }}">Generate Recap</a>
+            </li>
+        {% endfor %}
+    </ul>
 </body>
 </html>

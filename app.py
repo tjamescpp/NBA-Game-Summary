@@ -1,11 +1,70 @@
-from flask import Flask, render_template, request, jsonify
-from nba_api.stats.endpoints import boxscoretraditionalv2, playbyplayv2
+from flask import Flask, render_template, request, redirect, url_for
+from nba_api.stats.endpoints import scoreboardv2, boxscoretraditionalv2, playbyplayv2, teamdetails
+from datetime import datetime, timedelta, timezone
 import openai
+from dateutil import parser
 
 app = Flask(__name__)
 
 # Set up OpenAI API key (you could also load this from an environment variable for security)
 openai.api_key = "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"
+
+
+@app.route('/')
+def display_games():
+    # Calculate yesterday's date
+    yesterday = datetime.now() - timedelta(days=1)
+    yesterday_str = yesterday.strftime('%m/%d/%Y')
+
+    # Retrieve yesterday's games using the NBA API scoreboard
+    board = scoreboardv2.ScoreboardV2(game_date=yesterday_str)
+    # Retrieve the main DataFrame containing game data
+    games_data = board.get_data_frames()[0]
+
+    games = []
+    for _, game in games_data.iterrows():
+        # Get team abbreviations or use team IDs to map to names
+        away_team_id = game["VISITOR_TEAM_ID"]
+        home_team_id = game["HOME_TEAM_ID"]
+
+        # Use teamdetails to get team names for IDs
+        away_team_name = get_team_name(away_team_id)
+        home_team_name = get_team_name(home_team_id)
+
+        # Convert game time to local timezone
+        game_time_ltz = parser.parse(game["GAME_DATE_EST"]).replace(
+            tzinfo=timezone.utc).astimezone(tz=None)
+        games.append({
+            "game_id": game['GAME_ID'],
+            "away_team": away_team_name,
+            "home_team": home_team_name,
+            "game_time": game_time_ltz.strftime('%Y-%m-%d %I:%M %p')
+        })
+
+    # Render the games on the main page
+    return render_template('index.html', games=games)
+
+
+@app.route('/generate_recap/<game_id>')
+def generate_recap(game_id):
+    try:
+        # Fetch game data using the NBA API
+        boxscore_data, play_by_play_data = fetch_nba_data(game_id)
+
+        # Generate a game recap using the data
+        recap = create_game_recap(boxscore_data, play_by_play_data)
+        return render_template('recap.html', recap=recap)
+
+    except Exception as e:
+        return render_template('recap.html', error=f"An error occurred: {str(e)}")
+
+
+def get_team_name(team_id):
+    # Function to map team ID to team name using teamdetails
+    team_data = teamdetails.TeamDetails(team_id=team_id).get_data_frames()[0]
+    team_name = team_data[team_data["TEAM_ID"]
+                          == team_id]["ABBREVIATION"].values[0]
+    return team_name
 
 
 def fetch_nba_data(game_id):
@@ -22,7 +81,7 @@ def fetch_nba_data(game_id):
     return boxscore_data, play_by_play_data
 
 
-def generate_recap(boxscore_data, play_by_play_data):
+def create_game_recap(boxscore_data, play_by_play_data):
     # Extract key information to include in the prompt
     team_abbreviations = boxscore_data['TEAM_ABBREVIATION'].unique()
     top_scorer = boxscore_data.loc[boxscore_data['PTS'].idxmax()]
@@ -49,24 +108,6 @@ def generate_recap(boxscore_data, play_by_play_data):
     )
 
     return response.choices[0].message['content'].strip()
-
-
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        game_id = request.form.get('game_id')
-        try:
-            # Fetch game data using the NBA API
-            boxscore_data, play_by_play_data = fetch_nba_data(game_id)
-
-            # Generate a game recap using the data
-            recap = generate_recap(boxscore_data, play_by_play_data)
-            return render_template('index.html', recap=recap)
-
-        except Exception as e:
-            return render_template('index.html', error=f"An error occurred: {str(e)}")
-
-    return render_template('index.html')
 
 
 if __name__ == '__main__':
