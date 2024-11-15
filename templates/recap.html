@@ -48,19 +48,19 @@
 </style>
 
 <body>
-    <h1>NBA Game Recap</h1>
-    
-    <!-- Display the generated summary -->
-    <div>
-        <p><strong>Summary:</strong></p>
+    <h1>Game Summary</h1>
+
+    {% if summary %}
         <ul>
             {% for point in summary %}
-                <li>{{ point }}</li>  <!-- Display each formatted point as a list item -->
+                <li>{{ point }}</li>
             {% endfor %}
         </ul>
-        <a href="{{ url_for('display_games') }}">Back to Games</a>
-    </div>
+    {% else %}
+        <p>No summary available.</p>
+    {% endif %}
 
+    <a href="/">Back to Home</a>
 </body>
 </html>
 

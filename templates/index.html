@@ -8,14 +8,11 @@
 </head>
 <body>
     <h1>NBA Game Recap Generator</h1>
-    <h2>Games</h2>
-    <ul>
-        {% for game in games %}
-            <li>
-                {{ game.away_team }} vs. {{ game.home_team }} {{ game.game_time }}<br>
-                <a href="{{ url_for('generate_recap', game_id=game.game_id) }}">Generate Recap</a>
-            </li>
-        {% endfor %}
-    </ul>
+    <!-- Date Picker Form -->
+    <form action="/games" method="get">
+        <label for="game_date">Select a date:</label>
+        <input type="date" id="game_date" name="game_date" required>
+        <button type="submit">View Games</button>
+    </form>
 </body>
 </html>

@@ -20,17 +20,27 @@ app = Flask(__name__)
 
 
 @app.route('/')
+def index():
+    return render_template('index.html')
+
+
+@app.route('/games', methods=['GET'])
 def display_games():
 
-    # Define Eastern Time
-    eastern = pytz.timezone('US/Eastern')
+    # Get the selected date from the form
+    selected_date = request.args.get('game_date', None)
+    if not selected_date:
+        return "Error: No date provided."
 
-    # Calculate yesterday's date
-    yesterday = datetime.now(eastern) - timedelta(days=1)
-    yesterday_str = yesterday.strftime('%m/%d/%Y')
+    # Convert date to NBA API format
+    try:
+        game_date = datetime.strptime(
+            selected_date, '%Y-%m-%d').strftime('%m/%d/%Y')
+    except ValueError:
+        return "Error: Invalid date format."
 
     # Retrieve yesterday's games using the NBA API scoreboard
-    board = scoreboardv2.ScoreboardV2(game_date=yesterday_str)
+    board = scoreboardv2.ScoreboardV2(game_date=game_date)
     # Retrieve the main DataFrame containing game data
     games_data = board.get_data_frames()[0]
 
@@ -54,11 +64,11 @@ def display_games():
             "game_time": game_time_ltz.strftime('%Y-%m-%d')
         })
 
-    # Render the games on the main page
-    return render_template('index.html', games=games)
+    # Pass game information to the template
+    return render_template('games.html', games=games, game_date=selected_date)
 
 
-@app.route('/generate_recap/<game_id>')
+@app.route('/generate_recap/<game_id>', methods=['GET'])
 def generate_recap(game_id):
     try:
         # Fetch game data using the NBA API
