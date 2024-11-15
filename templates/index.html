@@ -12,7 +12,7 @@
     <ul>
         {% for game in games %}
             <li>
-                {{ game.away_team }} vs. {{ game.home_team }} at {{ game.game_time }}<br>
+                {{ game.away_team }} vs. {{ game.home_team }} {{ game.game_time }}<br>
                 <a href="{{ url_for('generate_recap', game_id=game.game_id) }}">Generate Recap</a>
             </li>
         {% endfor %}
