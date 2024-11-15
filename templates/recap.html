@@ -5,13 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NBA Game Recap</title>
 </head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
+    
+    h1, h2 {
+        color: #333;
+    }
+    
+    ul {
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        list-style-type: none;
+    }
+
+    li {
+        margin-bottom: 10px;
+        padding-left: 10px;
+    }
+
+    li::before {
+        content: "•";
+        color: #007BFF;
+        font-size: 20px;
+        padding-right: 10px;
+    }
+
+    p {
+        font-size: 16px;
+        color: #555;
+    }
+
+    strong {
+        font-weight: bold;
+    }
+</style>
+
 <body>
     <h1>NBA Game Recap</h1>
     
     <!-- Display the generated summary -->
     <div>
-        <h2>Game Summary</h2>
-        <p>{{ summary }}</p>
+        <p><strong>Summary:</strong></p>
+        <ul>
+            {% for point in summary %}
+                <li>{{ point }}</li>  <!-- Display each formatted point as a list item -->
+            {% endfor %}
+        </ul>
         <a href="{{ url_for('display_games') }}">Back to Games</a>
     </div>
 

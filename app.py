@@ -101,7 +101,7 @@ def create_game_recap(boxscore_data, play_by_play_data):
         f"The game was between {team_abbreviations[0]} and {team_abbreviations[1]}. "
         f"The final score was {team_scores[team_abbreviations[0]]} to {team_scores[team_abbreviations[1]]}. "
         f"The top scorer was {top_scorer['PLAYER_NAME']} from {top_scorer['TEAM_ABBREVIATION']} with {top_scorer['PTS']} points."
-        " Summarize the key moments from the game play-by-play data, focusing on exciting plays and turning points."
+        " Summarize the key moments from the game play-by-play data in a bullet-point list, focusing on exciting plays and turning points."
     )
 
     # Chat-based API call
@@ -117,9 +117,13 @@ def create_game_recap(boxscore_data, play_by_play_data):
     summary = response.choices[0].message.content
     print(summary)
 
-    # Render the recap.html template with the summary
-    # return render_template('recap.html', summary=summary)
-    return summary
+    # Format the summary to be split into sections
+    formatted_summary = summary.split('\n')
+    formatted_summary = summary.split('- ')
+    formatted_summary = [s.strip()
+                         for s in formatted_summary if s.strip()]  # Remove any extra spaces
+
+    return formatted_summary
 
 
 if __name__ == '__main__':
