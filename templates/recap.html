@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Recap</title>
+    <title>NBA Game Recap</title>
 </head>
 <body>
     <h1>NBA Game Recap</h1>
-    {% if recap %}
-        <p>{{ recap }}</p>
-    {% elif error %}
-        <p style="color: red;">{{ error }}</p>
-    {% endif %}
-    <a href="{{ url_for('display_games') }}">Back to Games</a>
+    
+    <!-- Display the generated summary -->
+    <div>
+        <h2>Game Summary</h2>
+        <p>{{ summary }}</p>
+        <a href="{{ url_for('display_games') }}">Back to Games</a>
+    </div>
+
 </body>
 </html>
+
