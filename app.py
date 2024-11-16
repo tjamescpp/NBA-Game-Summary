@@ -49,6 +49,7 @@ def display_games():
         # Get team abbreviations or use team IDs to map to names
         away_team_id = game["VISITOR_TEAM_ID"]
         home_team_id = game["HOME_TEAM_ID"]
+        game_status = game['GAME_STATUS_TEXT']
 
         # Use teamdetails to get team names for IDs
         away_team_name = get_team_name(away_team_id)
@@ -61,7 +62,8 @@ def display_games():
             "game_id": game['GAME_ID'],
             "away_team": away_team_name,
             "home_team": home_team_name,
-            "game_time": game_time_ltz.strftime('%Y-%m-%d')
+            "game_time": game_time_ltz.strftime('%Y-%m-%d'),
+            "game_status": game_status
         })
 
     # Pass game information to the template
