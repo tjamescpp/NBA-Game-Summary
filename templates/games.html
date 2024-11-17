@@ -10,24 +10,29 @@
 <body class="text-bg-dark p-3">
     <div class="container text-center">
         <h1>Games for {{ game_date }}</h1>
-        <div class="list-group">
-            {% if games %}
-                {% for game in games %}
-                    <!-- <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1"> {{ game['away_team'] }} @ {{ game['home_team'] }} </h5>
-                        <small> {{ game['game_time'] }} </small>
-                        <a href="/generate_recap/{{ game['game_id'] }}" class="list-group-item list-group-item-action active" aria-current="true">Generate Summary</a>
-                    </div> -->
-                    <a href="/generate_recap/{{ game['game_id'] }}" class="list-group-item list-group-item-action" aria-current="true">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1"> {{ game['away_team'] }} @ {{ game['home_team'] }} </h5>
-                            <small> {{ game['game_status'] }} </small>
-                        </div>
-                    </a>
-                {% endfor %}
-            {% else %}
-                <p>No games found for this date.</p>
-            {% endif %}
+        <div class="row">
+            <div class="col">
+                <div class="list-group">
+                    {% if games %}
+                        {% for game in games %}
+                            <a href="/generate_recap/{{ game['game_id'] }}" class="list-group-item list-group-item-action" aria-current="true">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1"> {{ game['away_team'] }} @ {{ game['home_team'] }} </h5>
+                                    <small> {{ game['game_status'] }} </small>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <p>No games found for this date.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                column
+            </div>
+            <div class="col">
+                column
+            </div>
         </div>
     </div>
 </body>

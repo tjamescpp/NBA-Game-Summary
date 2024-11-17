@@ -78,7 +78,9 @@ def generate_recap(game_id):
 
         # Generate a game recap using the data
         summary = create_game_recap(boxscore_data, play_by_play_data)
-        return render_template('recap.html', summary=summary)
+        teams = list(boxscore_data['TEAM_ABBREVIATION'].unique())
+        print(teams)
+        return render_template('recap.html', summary=summary, teams=teams)
 
     except Exception as e:
         return render_template('recap.html', error=f"An error occurred: {str(e)}")
