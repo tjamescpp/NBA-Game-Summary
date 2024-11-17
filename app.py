@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from nba_api.stats.endpoints import scoreboardv2, boxscoretraditionalv2, playbyplayv2, teamdetails
+from nba_api.stats.endpoints import scoreboardv2, boxscoretraditionalv2, playbyplayv2, teamdetails, boxscoresummaryv2
 from datetime import datetime, timedelta, timezone
 from openai import OpenAI
 from dateutil import parser
@@ -74,13 +74,23 @@ def display_games():
 def generate_recap(game_id):
     try:
         # Fetch game data using the NBA API
-        boxscore_data, play_by_play_data = fetch_nba_data(game_id)
+        boxscore_data = fetch_boxscore_data(game_id)
+        play_by_play_data = fetch_playbyplay_data(game_id)
+        boxscore_summary_data = fetch_boxscoresummary_data(game_id)
+
+        home_team = boxscore_summary_data.iloc[0]['TEAM_NICKNAME']
+        away_team = boxscore_summary_data.iloc[1]['TEAM_NICKNAME']
+        home_score = boxscore_summary_data.iloc[0]["PTS"]
+        away_score = boxscore_summary_data.iloc[1]["PTS"]
+
+        teams = [home_team, away_team]
+        scores = [home_score, away_score]
 
         # Generate a game recap using the data
         summary = create_game_recap(boxscore_data, play_by_play_data)
         teams = list(boxscore_data['TEAM_ABBREVIATION'].unique())
         print(teams)
-        return render_template('recap.html', summary=summary, teams=teams)
+        return render_template('recap.html', summary=summary, teams=teams, scores=scores)
 
     except Exception as e:
         return render_template('recap.html', error=f"An error occurred: {str(e)}")
@@ -94,18 +104,31 @@ def get_team_name(team_id):
     return team_name
 
 
-def fetch_nba_data(game_id):
+def fetch_boxscore_data(game_id):
     # Fetch box score data
     boxscore = boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=game_id)
     # Get the main boxscore DataFrame
     boxscore_data = boxscore.get_data_frames()[0]
 
+    return boxscore_data
+
+
+def fetch_playbyplay_data(game_id):
     # Fetch play-by-play data
     play_by_play = playbyplayv2.PlayByPlayV2(game_id=game_id)
     # Get play-by-play DataFrame
     play_by_play_data = play_by_play.get_data_frames()[0]
 
-    return boxscore_data, play_by_play_data
+    return play_by_play_data
+
+
+def fetch_boxscoresummary_data(game_id):
+    # Fetch play-by-play data
+    boxscore_summary = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game_id)
+    # Get play-by-play DataFrame
+    boxscore_summary_data = boxscore_summary.get_data_frames()[5]
+
+    return boxscore_summary_data
 
 
 def create_game_recap(boxscore_data, play_by_play_data):

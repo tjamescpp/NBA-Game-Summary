@@ -12,9 +12,16 @@
     <div class="container-fluid text-center">
         <h1>Game Summary</h1>
             {% if teams %}
-                <h3><p>
+                <h2><p>
                     {{ teams | join(' @ ') }}
-                </p></h3>
+                </p></h2>
+            {% else %}
+                <p>No teams available.</p>
+            {% endif %}
+            {% if scores %}
+                <h4><p>
+                    {{ scores | join(' - ') }}
+                </p></h4>
             {% else %}
                 <p>No teams available.</p>
             {% endif %}
@@ -27,9 +34,9 @@
                 <p>No summary available.</p>
             {% endif %}
         </ul>
-        <a class="icon-link icon-link-hover" href="/">
+        <a class="icon-link icon-link-hover mb-5" href="/">
+            <i class="bi bi-arrow-left" aria-hidden="true"></i>
             Back to Home
-            <i class="bi bi-arrow-right" aria-hidden="true"></i>
         </a>
     </div>
 </body>
