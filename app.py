@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, jsonify, render_template, request, redirect, url_for
 from nba_api.stats.endpoints import scoreboardv2, boxscoretraditionalv2, playbyplayv2, teamdetails, boxscoresummaryv2
 from datetime import datetime, timedelta, timezone
 from openai import OpenAI
@@ -6,7 +6,6 @@ from dateutil import parser
 import os
 from dotenv import load_dotenv
 import pandas as pd
-import numpy as np
 import pytz
 
 # Load environment variables from .env file
@@ -78,27 +77,23 @@ def display_games():
 
 @app.route('/generate_recap/<game_id>', methods=['GET'])
 def generate_recap(game_id):
-    try:
-        # Fetch game data using the NBA API
-        boxscore_data = fetch_boxscore_data(game_id)
-        play_by_play_data = fetch_playbyplay_data(game_id)
-        boxscore_summary_data = fetch_boxscoresummary_data(game_id)
+    # Fetch game data using the NBA API
+    boxscore_data = fetch_boxscore_data(game_id)
+    play_by_play_data = fetch_playbyplay_data(game_id)
+    boxscore_summary_data = fetch_boxscoresummary_data(game_id)
 
-        home_team = boxscore_summary_data.iloc[0]['TEAM_NICKNAME']
-        away_team = boxscore_summary_data.iloc[1]['TEAM_NICKNAME']
-        home_score = boxscore_summary_data.iloc[0]["PTS"]
-        away_score = boxscore_summary_data.iloc[1]["PTS"]
+    home_team = boxscore_summary_data.iloc[0]['TEAM_NICKNAME']
+    away_team = boxscore_summary_data.iloc[1]['TEAM_NICKNAME']
+    home_score = boxscore_summary_data.iloc[0]["PTS"]
+    away_score = boxscore_summary_data.iloc[1]["PTS"]
 
-        teams = [home_team, away_team]
-        scores = [home_score, away_score]
+    teams = [home_team, away_team]
+    scores = [home_score, away_score]
 
-        # Generate a game recap using the data
-        summary = create_game_recap(boxscore_data, play_by_play_data)
-        print(teams)
-        return render_template('recap.html', summary=summary, teams=teams, scores=scores)
-
-    except Exception as e:
-        return render_template('recap.html', error=f"An error occurred: {str(e)}")
+    # Generate a game recap using the data
+    summary = create_game_recap(boxscore_data, play_by_play_data)
+    print(teams)
+    return jsonify({"text": summary})
 
 
 def get_team_name(team_id):
