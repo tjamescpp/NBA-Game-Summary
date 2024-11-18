@@ -1,3 +1,9 @@
 flask
 nba-api
 openai
+datetime
+python-dateutil
+python-dotenv
+pandas
+numpy
+pytz
