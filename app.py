@@ -224,7 +224,8 @@ def create_game_recap(boxscore_data, play_by_play_data):
 
     # Get the summary from the response
     summary = response.choices[0].message.content
-    return summary
+    cleaned_summary = summary.replace("- ", "").strip()
+    return cleaned_summary
 
 
 if __name__ == '__main__':
