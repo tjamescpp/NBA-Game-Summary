@@ -56,7 +56,8 @@ def display_games():
         home_team_name = get_team_name(home_team_id)
 
         # get team scores
-        home_score, away_score = get_team_score(game['GAME_ID'])
+        home_score = get_team_score(game['GAME_ID'], home_team_id)
+        away_score = get_team_score(game['GAME_ID'], away_team_id)
 
         # Convert game time to local timezone
         game_time_ltz = parser.parse(game["GAME_DATE_EST"]).replace(
@@ -108,15 +109,12 @@ def get_team_name(team_id):
     return team_name
 
 
-def get_team_score(game_id):
+def get_team_score(game_id, team_id):
     # Fetch game data using the NBA API
-    boxscore_data = fetch_boxscore_data(game_id)
-    boxscore_summary_data = fetch_boxscoresummary_data(game_id)
+    data = fetch_boxscoresummary_data(game_id)
 
-    away_score = boxscore_summary_data.iloc[0]["PTS"]
-    home_score = boxscore_summary_data.iloc[1]["PTS"]
-
-    return home_score, away_score
+    score = data.loc[data['TEAM_ID'] == team_id]['PTS'].iloc[0]
+    return score
 
 
 def fetch_boxscore_data(game_id):
