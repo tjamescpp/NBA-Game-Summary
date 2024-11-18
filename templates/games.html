@@ -29,53 +29,58 @@
                         </div>
                         <div class="container mb-3">
                             <!-- Generate Button -->
-                            <button id="generateButton" class="btn btn-primary">Summary</button>
+                            <button class="btn btn-primary" onclick="fetchGameRecap('{{ game['game_id'] }}')">Summary</button>
                         </div>
                         <div class="card-footer text-body-secondary">
                             <small> {{ game_date }} </small>
                         </div>
                     </div>
-                    
-                    <!-- Modal -->
-                    <div class="modal fade" id="generatedModal" tabindex="-1" aria-labelledby="generatedModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="generatedModalLabel">Summary</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">Summary</button>
-                                </div>
-                                <div class="modal-body">
-                                    <p id="modalText"></p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 {% endfor %}
+
+                <!-- Recap Modal -->
+                <div id="recapModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                                            background: white; padding: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+                    <h4>Game Recap</h4>
+                    <p id="recapContent">Loading...</p>
+                    <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+                </div>
             {% else %}
                 <p>No games found for this date.</p>
             {% endif %}
         </div>
     </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- JavaScript -->
     <script>
-        document.getElementById("generateButton").addEventListener("click", async function () {
-            // Simulate API call
-            const response = await fetch('/generate_recap/<game_id>'); // Adjust endpoint as needed
-            const data = await response.json();
+        function fetchGameRecap(gameId) {
+            fetch(`/generate_recap/${gameId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Update the modal or popup content with the summary
+                    const recapModal = document.getElementById('recapModal');
+                    const recapContent = document.getElementById('recapContent');
+                    recapContent.textContent = data.text;
+                    
+                    // Show the modal
+                    recapModal.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('There was an error fetching the game recap:', error);
+                });
+        }
 
-            // Update modal text
-            const modalText = document.getElementById("modalText");
-            modalText.textContent = data.text || "Error: No text received.";
-
-            // Show the modal
-            const modal = new bootstrap.Modal(document.getElementById("generatedModal"));
-            modal.show();
-        });
+        // Close the modal
+        function closeModal() {
+            document.getElementById('recapModal').style.display = 'none';
+        }
     </script>
+
 </body>
 </html>

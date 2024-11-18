@@ -114,29 +114,63 @@ def get_team_score(game_id, team_id):
 
 def fetch_boxscore_data(game_id):
     # Fetch box score data
-    boxscore = boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=game_id)
-    # Get the main boxscore DataFrame
-    boxscore_data = boxscore.get_data_frames()[0]
-
-    return boxscore_data
+    try:
+        boxscore = boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=game_id)
+        data_frames = boxscore.get_data_frames()
+        if data_frames:
+            # Get the main boxscore DataFrame
+            boxscore_data = boxscore.get_data_frames()[0]
+            return boxscore_data
+        else:
+            print("No data available for the given game ID.")
+            return None
+    except KeyError as ke:
+        print(f"KeyError: {ke}")
+        print("Response structure may have changed or data is unavailable.")
+        return None
+    except Exception as e:
+        print(f"Error fetching boxscore data: {e}")
+        return None
 
 
 def fetch_playbyplay_data(game_id):
-    # Fetch play-by-play data
-    play_by_play = playbyplayv2.PlayByPlayV2(game_id=game_id)
-    # Get play-by-play DataFrame
-    play_by_play_data = play_by_play.get_data_frames()[0]
-
-    return play_by_play_data
+    try:
+        play_by_play = playbyplayv2.PlayByPlayV2(game_id=game_id)
+        data_frames = play_by_play.get_data_frames()
+        if data_frames:
+            # Get the main boxscore DataFrame
+            play_by_play_data = play_by_play.get_data_frames()[0]
+            return play_by_play_data
+        else:
+            print("No data available for the given game ID.")
+            return None
+    except KeyError as ke:
+        print(f"KeyError: {ke}")
+        print("Response structure may have changed or data is unavailable.")
+        return None
+    except Exception as e:
+        print(f"Error fetching boxscore data: {e}")
+        return None
 
 
 def fetch_boxscoresummary_data(game_id):
-    # Fetch play-by-play data
-    boxscore_summary = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game_id)
-    # Get play-by-play DataFrame
-    boxscore_summary_data = boxscore_summary.get_data_frames()[5]
-
-    return boxscore_summary_data
+    try:
+        boxscore_summary = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game_id)
+        data_frames = boxscore_summary.get_data_frames()
+        if data_frames:
+            # Get the main boxscore DataFrame
+            boxscore_summary_data = boxscore_summary.get_data_frames()[5]
+            return boxscore_summary_data
+        else:
+            print("No data available for the given game ID.")
+            return None
+    except KeyError as ke:
+        print(f"KeyError: {ke}")
+        print("Response structure may have changed or data is unavailable.")
+        return None
+    except Exception as e:
+        print(f"Error fetching boxscore data: {e}")
+        return None
 
 
 def create_game_recap(boxscore_data, play_by_play_data):
@@ -190,16 +224,7 @@ def create_game_recap(boxscore_data, play_by_play_data):
 
     # Get the summary from the response
     summary = response.choices[0].message.content
-    print(summary)
-
-    # Format the summary to be split into sections
-    formatted_summary = summary.split('\n')
-    formatted_summary = summary.split('- ')
-    formatted_summary = [s.strip()
-                         # Remove any extra spaces
-                         for s in formatted_summary if s.strip()]
-
-    return formatted_summary
+    return summary
 
 
 if __name__ == '__main__':
