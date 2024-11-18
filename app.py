@@ -55,6 +55,9 @@ def display_games():
         away_team_name = get_team_name(away_team_id)
         home_team_name = get_team_name(home_team_id)
 
+        # get team scores
+        home_score, away_score = get_team_score(game['GAME_ID'])
+
         # Convert game time to local timezone
         game_time_ltz = parser.parse(game["GAME_DATE_EST"]).replace(
             tzinfo=timezone.utc).astimezone(tz=None)
@@ -62,6 +65,8 @@ def display_games():
             "game_id": game['GAME_ID'],
             "away_team": away_team_name,
             "home_team": home_team_name,
+            "away_score": away_score,
+            "home_score": home_score,
             "game_time": game_time_ltz.strftime('%Y-%m-%d'),
             "game_status": game_status
         })
@@ -88,7 +93,6 @@ def generate_recap(game_id):
 
         # Generate a game recap using the data
         summary = create_game_recap(boxscore_data, play_by_play_data)
-        teams = list(boxscore_data['TEAM_ABBREVIATION'].unique())
         print(teams)
         return render_template('recap.html', summary=summary, teams=teams, scores=scores)
 
@@ -102,6 +106,17 @@ def get_team_name(team_id):
     team_name = team_data[team_data["TEAM_ID"]
                           == team_id]["NICKNAME"].values[0]
     return team_name
+
+
+def get_team_score(game_id):
+    # Fetch game data using the NBA API
+    boxscore_data = fetch_boxscore_data(game_id)
+    boxscore_summary_data = fetch_boxscoresummary_data(game_id)
+
+    away_score = boxscore_summary_data.iloc[0]["PTS"]
+    home_score = boxscore_summary_data.iloc[1]["PTS"]
+
+    return home_score, away_score
 
 
 def fetch_boxscore_data(game_id):
@@ -142,9 +157,12 @@ def create_game_recap(boxscore_data, play_by_play_data):
 
     # Generate a box score summary
     boxscore_summary = (
-        f"The game was between {team_abbreviations[0]} and {team_abbreviations[1]}. "
-        f"The final score was {team_scores[team_abbreviations[0]]} to {team_scores[team_abbreviations[1]]}. "
-        f"The top scorer was {top_scorer['PLAYER_NAME']} from {top_scorer['TEAM_ABBREVIATION']} "
+        f"The game was between {team_abbreviations[0]} and {
+            team_abbreviations[1]}. "
+        f"The final score was {team_scores[team_abbreviations[0]]} to {
+            team_scores[team_abbreviations[1]]}. "
+        f"The top scorer was {top_scorer['PLAYER_NAME']} from {
+            top_scorer['TEAM_ABBREVIATION']} "
         f"with {top_scorer['PTS']} points."
     )
 
@@ -154,7 +172,8 @@ def create_game_recap(boxscore_data, play_by_play_data):
             play_by_play_data['SCORE'] != '')
     ]
     key_moments_summary = "\n".join(
-        f"- {row['PERIOD']}Q, {row['PCTIMESTRING']}: {row['HOMEDESCRIPTION'] or row['VISITORDESCRIPTION']} "
+        f"- {row['PERIOD']}Q, {row['PCTIMESTRING']
+                               }: {row['HOMEDESCRIPTION'] or row['VISITORDESCRIPTION']} "
         for _, row in key_moments.iterrows()
     )
 
@@ -184,7 +203,8 @@ def create_game_recap(boxscore_data, play_by_play_data):
     formatted_summary = summary.split('\n')
     formatted_summary = summary.split('- ')
     formatted_summary = [s.strip()
-                         for s in formatted_summary if s.strip()]  # Remove any extra spaces
+                         # Remove any extra spaces
+                         for s in formatted_summary if s.strip()]
 
     return formatted_summary
 
