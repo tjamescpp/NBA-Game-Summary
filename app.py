@@ -58,6 +58,9 @@ def display_games():
         away_team_name = get_team_name(away_team_id)
         home_team_name = get_team_name(home_team_id)
 
+        # get team logo
+        away_team_logo = get_team_logo(away_team_name)
+
         # get team scores
         home_score = pts_data.loc[pts_data['TEAM_ID']
                                   == home_team_id]['PTS'].values[0]
@@ -73,6 +76,7 @@ def display_games():
             "home_team": home_team_name,
             "away_score": away_score,
             "home_score": home_score,
+            "away_team_logo": away_team_logo,
             "game_time": game_time_ltz.strftime('%Y-%m-%d'),
             "game_status": game_status
         })
@@ -100,6 +104,22 @@ def generate_recap(game_id):
     summary = create_game_recap(boxscore_data, play_by_play_data)
     print(teams)
     return jsonify({"text": summary})
+
+
+def get_team_logo(team_name):
+
+    team_logos = {
+        "Lakers": "https://content.sportslogos.net/logos/6/237/full/los_angeles_lakers_logo_primary_2024_sportslogosnet-7324.png"
+        # Add all other teams
+    }
+
+    if team_name in team_logos:
+        logo_url = team_logos[team_name]
+    else:
+        logo_url = None
+        print("no logo found for this team")
+
+    return logo_url
 
 
 def get_team_name(team_id):
