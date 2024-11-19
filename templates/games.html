@@ -13,7 +13,7 @@
         <div class="bd-content w-75">
             {% if games %}
                 {% for game in games %}
-                    <div class="card mb-3">
+                    <div class="card bg-dark text-white mb-3">
                         <div class="card-header">
                             <small> {{ game['game_status'] }} </small>
                         </div>
@@ -25,7 +25,7 @@
                             <!-- Generate Button -->
                             <button class="btn btn-primary" onclick="fetchGameRecap('{{ game['game_id'] }}')">Summarize</button>
                         </div>
-                        <div class="card-footer text-body-secondary">
+                        <div class="card-footer">
                             <small> {{ game_date }} </small>
                         </div>
                     </div>
@@ -33,7 +33,7 @@
 
                 <div class="modal" tabindex="-1" id="recapModal">
                     <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
+                        <div class="modal-content bg-dark text-white">
                         <div class="modal-header">
                             <h5 class="modal-title">AI Generated Summary</h5>
                         </div>
@@ -41,7 +41,7 @@
                             <p id="recapContent">Loading...</p>
                         </div>
                         <div class="modal-footer">
-                            <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+                            <button class="btn btn-secondary btn-close-white" onclick="closeModal()">Close</button>
                         </div>
                         </div>
                     </div>

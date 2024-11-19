@@ -46,8 +46,8 @@ def display_games():
     games = []
     for _, game in games_data.iterrows():
         # Get team abbreviations or use team IDs to map to names
-        away_team_id = game["VISITOR_TEAM_ID"]
-        home_team_id = game["HOME_TEAM_ID"]
+        away_team_id = int(game["VISITOR_TEAM_ID"])
+        home_team_id = int(game["HOME_TEAM_ID"])
         game_status = game['GAME_STATUS_TEXT']
 
         # Use teamdetails to get team names for IDs
@@ -98,7 +98,8 @@ def generate_recap(game_id):
 
 def get_team_name(team_id):
     # Function to map team ID to team name using teamdetails
-    team_data = teamdetails.TeamDetails(team_id=team_id).get_data_frames()[0]
+    team_data = pd.DataFrame(teamdetails.TeamDetails(
+        team_id=team_id).get_data_frames()[0])
     team_name = team_data[team_data["TEAM_ID"]
                           == team_id]["NICKNAME"].values[0]
     return team_name
@@ -106,7 +107,7 @@ def get_team_name(team_id):
 
 def get_team_score(game_id, team_id):
     # Fetch game data using the NBA API
-    data = fetch_boxscoresummary_data(game_id)
+    data = pd.DataFrame(fetch_boxscoresummary_data(game_id))
 
     score = data.loc[data['TEAM_ID'] == team_id]['PTS'].iloc[0]
     return score
@@ -119,7 +120,7 @@ def fetch_boxscore_data(game_id):
         data_frames = boxscore.get_data_frames()
         if data_frames:
             # Get the main boxscore DataFrame
-            boxscore_data = boxscore.get_data_frames()[0]
+            boxscore_data = pd.DataFrame(boxscore.get_data_frames()[0])
             return boxscore_data
         else:
             print("No data available for the given game ID.")
@@ -139,7 +140,7 @@ def fetch_playbyplay_data(game_id):
         data_frames = play_by_play.get_data_frames()
         if data_frames:
             # Get the main boxscore DataFrame
-            play_by_play_data = play_by_play.get_data_frames()[0]
+            play_by_play_data = pd.DataFrame(play_by_play.get_data_frames()[0])
             return play_by_play_data
         else:
             print("No data available for the given game ID.")
@@ -159,7 +160,8 @@ def fetch_boxscoresummary_data(game_id):
         data_frames = boxscore_summary.get_data_frames()
         if data_frames:
             # Get the main boxscore DataFrame
-            boxscore_summary_data = boxscore_summary.get_data_frames()[5]
+            boxscore_summary_data = pd.DataFrame(
+                boxscore_summary.get_data_frames()[5])
             return boxscore_summary_data
         else:
             print("No data available for the given game ID.")
