@@ -4,29 +4,32 @@
 
 {% block content %}
 <body class="text-center">
-    <h1>Games</h1>
-    <a class="icon-link icon-link-hover mb-5" href="/">
-        <i class="bi bi-arrow-left" aria-hidden="true"></i>
-        Back to Home
-    </a>
+    <div>
+        <h1>Games</h1>
+        <small> {{ game_date }} </small>
+        <div>
+            <a class="icon-link icon-link-hover mb-5" href="/">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                Back to Home
+            </a>
+        </div>
+    </div>
     <div class="container d-flex justify-content-center align-items-center text-center">
         <div class="bd-content w-75">
             {% if games %}
                 {% for game in games %}
                     <div class="card bg-dark text-white mb-3">
                         <div class="card-header">
-                            <small> {{ game['game_status'] }} </small>
+                            <small> NBA </small>
                         </div>
                         <div class="card-body">
                             <h3 class="mb-1"> {{ game['away_team'] }} @ {{ game['home_team'] }} </h3>
                             <h4 class="mb-1"> {{ game['away_score']}} - {{ game['home_score'] }} </h4>
+                            <small> {{ game['game_status'] }} </small>
                         </div>
                         <div class="container mb-3">
                             <!-- Generate Button -->
                             <button class="btn btn-primary" onclick="fetchGameRecap('{{ game['game_id'] }}')">Summarize</button>
-                        </div>
-                        <div class="card-footer">
-                            <small> {{ game_date }} </small>
                         </div>
                     </div>
                 {% endfor %}

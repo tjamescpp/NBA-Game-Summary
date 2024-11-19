@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %}Home - NBA Game Recap{% endblock %}
+{% block title %}Home - Recap.ai{% endblock %}
 
 {% block content %}
 <body>
     <div class="container-fluid text-center">
-        <h1>NBA Game Recap Generator</h1>
+        <h1>Find Games</h1>
         <!-- Date Picker Form -->
         <form action="/games" method="get">
             <label for="game_date">Select a date:</label>
             <input type="date" id="game_date" name="game_date" required>
-            <button type="submit">View Games</button>
+            <button class="button" type="submit">View Games</button>
         </form>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

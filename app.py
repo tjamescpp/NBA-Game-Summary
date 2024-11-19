@@ -17,6 +17,8 @@ client = OpenAI()
 
 app = Flask(__name__)
 
+timeout = 60
+
 
 @app.route('/')
 def index():
@@ -38,16 +40,18 @@ def display_games():
     except ValueError:
         return "Error: Invalid date format."
 
-    # Retrieve yesterday's games using the NBA API scoreboard
-    board = scoreboardv2.ScoreboardV2(game_date=game_date)
+    # Retrieve games using the NBA API scoreboard
+    board = scoreboardv2.ScoreboardV2(game_date=game_date, timeout=timeout)
     # Retrieve the main DataFrame containing game data
-    games_data = board.get_data_frames()[0]
+    games_data = pd.DataFrame(board.get_data_frames()[0])
+    pts_data = pd.DataFrame(board.get_data_frames()[1])
+    print(games_data.columns)
 
     games = []
     for _, game in games_data.iterrows():
         # Get team abbreviations or use team IDs to map to names
-        away_team_id = int(game["VISITOR_TEAM_ID"])
-        home_team_id = int(game["HOME_TEAM_ID"])
+        away_team_id = game["VISITOR_TEAM_ID"]
+        home_team_id = game["HOME_TEAM_ID"]
         game_status = game['GAME_STATUS_TEXT']
 
         # Use teamdetails to get team names for IDs
@@ -55,8 +59,10 @@ def display_games():
         home_team_name = get_team_name(home_team_id)
 
         # get team scores
-        home_score = get_team_score(game['GAME_ID'], home_team_id)
-        away_score = get_team_score(game['GAME_ID'], away_team_id)
+        home_score = pts_data.loc[pts_data['TEAM_ID']
+                                  == home_team_id]['PTS'].values[0]
+        away_score = pts_data.loc[pts_data['TEAM_ID']
+                                  == away_team_id]['PTS'].values[0]
 
         # Convert game time to local timezone
         game_time_ltz = parser.parse(game["GAME_DATE_EST"]).replace(
@@ -97,17 +103,38 @@ def generate_recap(game_id):
 
 
 def get_team_name(team_id):
-    # Function to map team ID to team name using teamdetails
-    team_data = pd.DataFrame(teamdetails.TeamDetails(
-        team_id=team_id).get_data_frames()[0])
-    team_name = team_data[team_data["TEAM_ID"]
-                          == team_id]["NICKNAME"].values[0]
-    return team_name
+    """
+    Function to map team ID to team name using teamdetails.
+    Args:
+        team_id (int): The ID of the team.
+        timeout (int): The maximum time (in seconds) to wait for the API response.
+    Returns:
+        str: The team's nickname.
+    """
+    try:
+        # Fetch team details with a specified timeout
+        team_data = pd.DataFrame(teamdetails.TeamDetails(
+            team_id=team_id, timeout=timeout).get_data_frames()[0])
+
+        # Extract and return the team nickname
+        team_name = team_data[team_data["TEAM_ID"]
+                              == team_id]["NICKNAME"].values[0]
+        return team_name
+
+    except Exception as e:
+        print(f"Error fetching team name: {e}")
+        return None
 
 
 def get_team_score(game_id, team_id):
     # Fetch game data using the NBA API
     data = pd.DataFrame(fetch_boxscoresummary_data(game_id))
+
+    if not data.empty:
+        print(
+            f"Successfully retrieved box score summary for team_id: {team_id}")
+    else:
+        print(f"Failed retrieving box score summary for team_id: {team_id}")
 
     score = data.loc[data['TEAM_ID'] == team_id]['PTS'].iloc[0]
     return score
@@ -116,7 +143,8 @@ def get_team_score(game_id, team_id):
 def fetch_boxscore_data(game_id):
     # Fetch box score data
     try:
-        boxscore = boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=game_id)
+        boxscore = boxscoretraditionalv2.BoxScoreTraditionalV2(
+            game_id=game_id, timeout=timeout)
         data_frames = boxscore.get_data_frames()
         if data_frames:
             # Get the main boxscore DataFrame
@@ -136,7 +164,8 @@ def fetch_boxscore_data(game_id):
 
 def fetch_playbyplay_data(game_id):
     try:
-        play_by_play = playbyplayv2.PlayByPlayV2(game_id=game_id)
+        play_by_play = playbyplayv2.PlayByPlayV2(
+            game_id=game_id, timeout=timeout)
         data_frames = play_by_play.get_data_frames()
         if data_frames:
             # Get the main boxscore DataFrame
@@ -156,7 +185,8 @@ def fetch_playbyplay_data(game_id):
 
 def fetch_boxscoresummary_data(game_id):
     try:
-        boxscore_summary = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game_id)
+        boxscore_summary = boxscoresummaryv2.BoxScoreSummaryV2(
+            game_id=game_id, timeout=timeout)
         data_frames = boxscore_summary.get_data_frames()
         if data_frames:
             # Get the main boxscore DataFrame
