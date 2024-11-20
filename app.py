@@ -84,7 +84,7 @@ def display_games():
         })
 
     # Pass game information to the template
-    return render_template('games.html', games=games, game_date=selected_date)
+    return render_template('games.html', games=games, game_date=game_date)
 
 
 @app.route('/generate_recap/<game_id>', methods=['GET'])

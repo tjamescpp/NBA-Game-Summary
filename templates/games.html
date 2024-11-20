@@ -5,8 +5,8 @@
 {% block content %}
 <body class="text-center">
     <div>
-        <h1>Games</h1>
-        <small><i class="bi bi-calendar3"></i> {{ game_date }}</small><br>
+        <h1 class="display-5">Games</h1>
+        <p><i class="bi bi-calendar3"></i> {{ game_date }}</p>
         <a class="icon-link icon-link-hover mb-5" href="/">
             <i class="bi bi-arrow-left" aria-hidden="true"></i>
             Back to Home
@@ -23,8 +23,8 @@
                         <div class="card-body">
                             <img src="{{ game['away_team_logo'] }}" alt="{{ game['away_team'] }} Logo" class="img-fluid rounded float-start" style="height: 100px;">
                             <img src="{{ game['home_team_logo'] }}" alt="{{ game['home_team'] }} Logo" class="img-fluid rounded float-end" style="height: 100px;">
-                            <h3 class="mb-1"> {{ game['away_team'] }} @ {{ game['home_team'] }} </h3>
-                            <h4 class="mb-1"> {{ game['away_score']}} - {{ game['home_score'] }} </h4>
+                            <p class="mb-1 fs-4"> {{ game['away_team'] }} @ {{ game['home_team'] }} </p>
+                            <p class="mb-1 fs-4"> {{ game['away_score']}} - {{ game['home_score'] }} </p>
                             <small> {{ game['game_status'] }} </small>
                         </div>
                         <div class="container mb-3">
@@ -35,17 +35,17 @@
                 {% endfor %}
 
                 <div class="modal" tabindex="-1" id="recapModal">
-                    <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-dialog modal-xl modal-dialog-centered">
                         <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">AI Generated Summary</h5>
-                        </div>
-                        <div class="modal-body">
-                            <p id="recapContent">Loading...</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-secondary btn-close-white" onclick="closeModal()">Close</button>
-                        </div>
+                            <div class="modal-body" style="text-align: left;">
+                                <p class="lead" id="recapContent">Loading...</p>
+                                <figcaption class="blockquote-footer mt-2">
+                                    <cite title="Source Title">AI Generated Summary</cite>
+                                </figcaption>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-primary" onclick="closeModal()">Close</button>
+                            </div>
                         </div>
                     </div>
                 </div>
