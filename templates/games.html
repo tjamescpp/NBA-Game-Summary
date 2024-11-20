@@ -21,18 +21,15 @@
                             <small> NBA </small>
                         </div>
                         <div class="card-body">
-                        {% if game['away_team_logo'] %}
-                            <img src="{{ game['away_team_logo'] }}" alt="{{ game['away_team'] }} Logo" class="img-fluid rounded-float-start" style="height: 50px;>
-                        {% else %}
-                            <p> no logo found </p>
-                        {% endif %}
+                            <img src="{{ game['away_team_logo'] }}" alt="{{ game['away_team'] }} Logo" class="img-fluid rounded float-start" style="height: 100px;">
+                            <img src="{{ game['home_team_logo'] }}" alt="{{ game['home_team'] }} Logo" class="img-fluid rounded float-end" style="height: 100px;">
                             <h3 class="mb-1"> {{ game['away_team'] }} @ {{ game['home_team'] }} </h3>
                             <h4 class="mb-1"> {{ game['away_score']}} - {{ game['home_score'] }} </h4>
                             <small> {{ game['game_status'] }} </small>
                         </div>
                         <div class="container mb-3">
                             <!-- Generate Button -->
-                            <button class="btn btn-light" onclick="fetchGameRecap('{{ game['game_id'] }}')">Summarize</button>
+                            <button class="btn btn-primary" onclick="fetchGameRecap('{{ game['game_id'] }}')">Summarize</button>
                         </div>
                     </div>
                 {% endfor %}
