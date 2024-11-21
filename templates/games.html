@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}NBA Game Recap - Games{% endblock %}
+{% block title %} GameCap.ai - Games {% endblock %}
 
 {% block content %}
 <body class="text-center">
@@ -30,6 +30,7 @@
                         <div class="container mb-3">
                             <!-- Generate Button -->
                             <button class="btn btn-primary" onclick="fetchGameRecap('{{ game['game_id'] }}')">Summarize</button>
+                            <a href="/boxscore/{{ game['game_id'] }}" class="btn btn-secondary">View Boxscore</a>
                         </div>
                     </div>
                 {% endfor %}

@@ -90,9 +90,9 @@ def display_games():
 @app.route('/generate_recap/<game_id>', methods=['GET'])
 def generate_recap(game_id):
     # Fetch game data using the NBA API
-    boxscore_data = fetch_boxscore_data(game_id)
-    play_by_play_data = fetch_playbyplay_data(game_id)
-    boxscore_summary_data = fetch_boxscoresummary_data(game_id)
+    boxscore_data = get_boxscore_data(game_id)
+    play_by_play_data = get_playbyplay_data(game_id)
+    boxscore_summary_data = get_boxscoresummary_data(game_id)
 
     home_team = boxscore_summary_data.iloc[0]['TEAM_NICKNAME']
     away_team = boxscore_summary_data.iloc[1]['TEAM_NICKNAME']
@@ -106,6 +106,37 @@ def generate_recap(game_id):
     summary = create_game_recap(boxscore_data, play_by_play_data)
     print(teams)
     return jsonify({"text": summary})
+
+
+@app.route('/boxscore/<game_id>')
+def boxscore(game_id):
+    # Fetch boxscore data
+    boxscore_data = get_boxscore_data(game_id)
+
+    # drop columns that aren't needed for boxscore
+    columns_to_drop = [0, 3, 4, 6, 8]
+    boxscore_data = boxscore_data.drop(
+        boxscore_data.columns[columns_to_drop], axis=1)
+    print(boxscore_data.info())
+
+    boxscore_data_dict = boxscore_data.to_dict(orient='records')
+
+    # Prepare a mapping of team_id to team_name
+    team_mapping = {
+        row['TEAM_ID']: row['TEAM_ABBREVIATION'] for row in boxscore_data_dict
+    }
+
+    print(team_mapping)
+
+    # Send team_ids and names as a list of tuples
+    teams = [{'id': team_id, 'name': name}
+             for team_id, name in team_mapping.items()]
+
+    return render_template(
+        'boxscore.html',
+        boxscore_data=boxscore_data_dict,
+        teams=teams
+    )
 
 
 def get_team_logo(team_name):
@@ -179,7 +210,7 @@ def get_team_name(team_id):
 
 def get_team_score(game_id, team_id):
     # Fetch game data using the NBA API
-    data = pd.DataFrame(fetch_boxscoresummary_data(game_id))
+    data = pd.DataFrame(get_boxscoresummary_data(game_id))
 
     if not data.empty:
         print(
@@ -191,7 +222,7 @@ def get_team_score(game_id, team_id):
     return score
 
 
-def fetch_boxscore_data(game_id):
+def get_boxscore_data(game_id):
     # Fetch box score data
     try:
         boxscore = boxscoretraditionalv2.BoxScoreTraditionalV2(
@@ -213,7 +244,7 @@ def fetch_boxscore_data(game_id):
         return None
 
 
-def fetch_playbyplay_data(game_id):
+def get_playbyplay_data(game_id):
     try:
         play_by_play = playbyplayv2.PlayByPlayV2(
             game_id=game_id, timeout=timeout)
@@ -234,7 +265,7 @@ def fetch_playbyplay_data(game_id):
         return None
 
 
-def fetch_boxscoresummary_data(game_id):
+def get_boxscoresummary_data(game_id):
     try:
         boxscore_summary = boxscoresummaryv2.BoxScoreSummaryV2(
             game_id=game_id, timeout=timeout)
