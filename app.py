@@ -119,22 +119,59 @@ def boxscore(game_id):
         boxscore_data.columns[columns_to_drop], axis=1)
     print(boxscore_data.info())
 
+    # change column names
+    boxscore_data = boxscore_data.rename(columns={
+        "TEAM_ABBREVIATION": "TEAM",
+        "PLAYER_NAME": "PLAYER",
+        "START_POSITION": "POS",
+        "FG_PCT": "FG%",
+        "FG3M": "3PM",
+        "FG3A": "3PA",
+        "FG3_PCT": "3P%",
+        "FT_PCT": "FT%",
+        "PLUS_MINUS": "+/-"
+    })
+
     boxscore_data_dict = boxscore_data.to_dict(orient='records')
 
     # Prepare a mapping of team_id to team_name
     team_mapping = {
-        row['TEAM_ID']: row['TEAM_ABBREVIATION'] for row in boxscore_data_dict
+        row['TEAM_ID']: row['TEAM'] for row in boxscore_data_dict
     }
-
-    print(team_mapping)
 
     # Send team_ids and names as a list of tuples
     teams = [{'id': team_id, 'name': name}
              for team_id, name in team_mapping.items()]
 
+    # drop team_id
+    boxscore_data = boxscore_data.drop(columns="TEAM_ID")
+
+    # Convert the column to min:sec format
+    boxscore_data['MIN'] = boxscore_data['MIN'].apply(lambda x: "0:00" if pd.isna(
+        x) else f"{int(float(x.split(':')[0]))}:{int(x.split(':')[1])}")
+
+    print(boxscore_data.info())
+
+    # fill nan values with 0
+    boxscore_data = boxscore_data.fillna(0)
+
+    # convert floats to ints
+    columns_to_convert = ["FGM", "FGA", "3PM", "3PA", "FTM", "FTA",
+                          "OREB", "DREB", "REB", "AST", "STL", "BLK", "TO", "PF", "PTS", "+/-"]
+    boxscore_data[columns_to_convert] = boxscore_data[columns_to_convert].astype(
+        int)
+
+    # convert percentages
+    boxscore_data['FG%'] = round(boxscore_data['FG%'] * 100, 2)
+    boxscore_data['3P%'] = round(boxscore_data['3P%'] * 100, 2)
+    boxscore_data['FT%'] = round(boxscore_data['FT%'] * 100, 2)
+
+    # convert finals boxscore to dictionary
+    boxscore_data = boxscore_data.to_dict(orient='records')
+
     return render_template(
         'boxscore.html',
-        boxscore_data=boxscore_data_dict,
+        boxscore_data=boxscore_data,
         teams=teams
     )
 

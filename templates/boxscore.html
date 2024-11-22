@@ -10,9 +10,8 @@
     <div class="mb-5">
         <label for="teamFilter" class="form-label">Filter by Team</label>
         <select id="teamFilter" class="form-select mb-3">
-            <option value="All">All Teams</option>
             {% for team in teams %}
-                <option value="{{ team['id'] }}">{{ team['name'] }}</option>
+                <option value="{{ team['name'] }}" {% if loop.first %}selected{% endif %}>{{ team['name'] }}</option>
             {% endfor %}
         </select>
     </div>
@@ -29,7 +28,7 @@
             </thead>
             <tbody class="table-group-divider" id="boxscoreTable">
                 {% for row in boxscore_data %}
-                    <tr data-team-id="{{ row['TEAM_ID'] }}">
+                    <tr data-team-name="{{ row['TEAM'] }}">
                         {% for value in row.values() %}
                             <td>{{ value }}</td>
                         {% endfor %}
@@ -41,20 +40,30 @@
 </div>
 
 <script>
-    const teamFilter = document.getElementById('teamFilter');
-    const tableRows = document.querySelectorAll('#boxscoreTable tr');
+    document.addEventListener('DOMContentLoaded', function () {
+        const dropdown = document.getElementById('teamFilter');
+        const table = document.getElementById('boxscoreTable');
+        const rows = table.querySelectorAll('tbody tr');
+        
+        // Function to filter the table by team name
+        function filterTable(teamName) {
+            rows.forEach(row => {
+                const rowTeamName = row.getAttribute('data-team-name');
+                if (teamName === "All" || rowTeamName === teamName) {
+                    row.style.display = ''; // Show row
+                } else {
+                    row.style.display = 'none'; // Hide row
+                }
+            });
+        }
 
-    teamFilter.addEventListener('change', () => {
-        const selectedTeamId = teamFilter.value;
+        // Filter by the first team on page load (default selection)
+        filterTable(dropdown.value);
 
-        tableRows.forEach(row => {
-            const rowTeamId = row.getAttribute('data-team-id');
-
-            if (selectedTeamId === 'All' || rowTeamId === selectedTeamId) {
-                row.style.display = ''; // Show row
-            } else {
-                row.style.display = 'none'; // Hide row
-            }
+        // Add event listener to dropdown to filter when selection changes
+        dropdown.addEventListener('change', function () {
+            const selectedTeam = this.value;
+            filterTable(selectedTeam);
         });
     });
 </script>
