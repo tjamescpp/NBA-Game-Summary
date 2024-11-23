@@ -29,7 +29,13 @@
                         </div>
                         <div class="container mb-3">
                             <!-- Generate Button -->
-                            <a href="/boxscore/{{ game['game_id'] }}?action=summarize&game_date={{ game_date }}" class="btn btn-primary">Summarize</a>
+                            <a href="/boxscore/{{ game['game_id'] }}?action=summarize&game_date={{ game_date }}" class="btn btn-primary" onclick="showSpinner()">Summarize</a>
+                            <!-- Spinner (initially hidden) -->
+                            <div class="d-flex justify-content-center">
+                                <div id="loadingSpinner" class="spinner-border mt-3" aria-hidden="true" role="status" style="display: none;">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 {% endfor %}
@@ -39,4 +45,14 @@
         </div>
     </div>
 </body>
+
+<script>
+    function showSpinner() {
+        const spinner = document.getElementById('loadingSpinner');
+        if (spinner) {
+            spinner.style.display = 'block';
+        }
+    }
+</script>
+
 {% endblock %}
