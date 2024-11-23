@@ -30,6 +30,7 @@ def display_games():
 
     # Get the selected date from the form
     selected_date = request.args.get('game_date', None)
+    print(selected_date)
     if not selected_date:
         return "Error: No date provided."
 
@@ -37,6 +38,7 @@ def display_games():
     try:
         game_date = datetime.strptime(
             selected_date, '%Y-%m-%d').strftime('%m/%d/%Y')
+        print(game_date)
     except ValueError:
         return "Error: Invalid date format."
 
@@ -45,7 +47,6 @@ def display_games():
     # Retrieve the main DataFrame containing game data
     games_data = pd.DataFrame(board.get_data_frames()[0])
     pts_data = pd.DataFrame(board.get_data_frames()[1])
-    print(games_data.columns)
 
     games = []
     for _, game in games_data.iterrows():
@@ -84,32 +85,40 @@ def display_games():
         })
 
     # Pass game information to the template
-    return render_template('games.html', games=games, game_date=game_date)
+    return render_template('games.html', games=games, game_date=selected_date)
 
 
-@app.route('/generate_recap/<game_id>', methods=['GET'])
 def generate_recap(game_id):
     # Fetch game data using the NBA API
     boxscore_data = get_boxscore_data(game_id)
     play_by_play_data = get_playbyplay_data(game_id)
-    boxscore_summary_data = get_boxscoresummary_data(game_id)
-
-    home_team = boxscore_summary_data.iloc[0]['TEAM_NICKNAME']
-    away_team = boxscore_summary_data.iloc[1]['TEAM_NICKNAME']
-    home_score = boxscore_summary_data.iloc[0]["PTS"]
-    away_score = boxscore_summary_data.iloc[1]["PTS"]
-
-    teams = [home_team, away_team]
-    scores = [home_score, away_score]
 
     # Generate a game recap using the data
     summary = create_game_recap(boxscore_data, play_by_play_data)
-    print(teams)
-    return jsonify({"text": summary})
+    return summary
 
 
 @app.route('/boxscore/<game_id>')
 def boxscore(game_id):
+    action = request.args.get('action', default=None)
+    game_date = request.args.get('game_date')  # Provide a fallback date
+    # Replace with your boxscore fetching logic
+    boxscore_data, teams = display_boxscore(game_id)
+    summary = None
+
+    if action == 'summarize':
+        # Generate the game summary (replace with your logic)
+        summary = generate_recap(game_id)
+
+    return render_template('boxscore.html',
+                           game_id=game_id,
+                           boxscore_data=boxscore_data,
+                           summary=summary,
+                           teams=teams,
+                           game_date=game_date)
+
+
+def display_boxscore(game_id):
     # Fetch boxscore data
     boxscore_data = get_boxscore_data(game_id)
 
@@ -169,11 +178,7 @@ def boxscore(game_id):
     # convert finals boxscore to dictionary
     boxscore_data = boxscore_data.to_dict(orient='records')
 
-    return render_template(
-        'boxscore.html',
-        boxscore_data=boxscore_data,
-        teams=teams
-    )
+    return (boxscore_data, teams)
 
 
 def get_team_logo(team_name):

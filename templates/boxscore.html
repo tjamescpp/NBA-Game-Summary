@@ -1,10 +1,25 @@
 {% extends "base.html" %}
 
-{% block title %} GameCap.ai - Boxscore {% endblock %}
+{% block title %} GameCap.ai - Box Score {% endblock %}
 
 {% block content %}
+
+<!-- Displays the ai-generated summary -->
+<div class="summary-container mb-5">
+    <h3>Game Summary</h3>
+    {% if summary %}
+        <p class="lead lh-lg">{{ summary }}</p>
+    {% else %}
+        <p>Click "Summarize" on the games page to see the AI-generated game summary.</p>
+    {% endif %}
+    <figcaption class="blockquote-footer mt-2">
+        <cite title="Source Title">AI Generated Summary</cite>
+    </figcaption>
+</div>
+
+<!-- displays the boxscore -->
 <div class="container my-4">
-    <h1 class="text-center">Boxscore</h1>
+    <h1 class="text-center">Box Score</h1>
 
     <!-- Team Filter Dropdown -->
     <div class="mb-5">
@@ -37,6 +52,14 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Back button -->
+    <div class="mb-4">
+        <a href="/games?game_date={{ game_date }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Games
+        </a>
+    </div>
+
 </div>
 
 <script>
@@ -67,6 +90,5 @@
         });
     });
 </script>
-
 
 {% endblock %}
