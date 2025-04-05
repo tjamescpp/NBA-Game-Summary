@@ -352,8 +352,7 @@ def create_game_recap(boxscore_data, play_by_play_data):
             play_by_play_data['SCORE'] != '')
     ]
     key_moments_summary = "\n".join(
-        f"- {row['PERIOD']}Q, {row['PCTIMESTRING']
-                               }: {row['HOMEDESCRIPTION'] or row['VISITORDESCRIPTION']} "
+        f"- {row['PERIOD']}Q, {row['PCTIMESTRING']}: {row['HOMEDESCRIPTION'] or row['VISITORDESCRIPTION']} "
         for _, row in key_moments.iterrows()
     )
 
