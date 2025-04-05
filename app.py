@@ -340,12 +340,9 @@ def create_game_recap(boxscore_data, play_by_play_data):
 
     # Generate a box score summary
     boxscore_summary = (
-        f"The game was between {team_abbreviations[0]} and {
-            team_abbreviations[1]}. "
-        f"The final score was {team_scores[team_abbreviations[0]]} to {
-            team_scores[team_abbreviations[1]]}. "
-        f"The top scorer was {top_scorer['PLAYER_NAME']} from {
-            top_scorer['TEAM_ABBREVIATION']} "
+        f"The game was between {team_abbreviations[0]} and {team_abbreviations[1]}. "
+        f"The final score was {team_scores[team_abbreviations[0]]} to {team_scores[team_abbreviations[1]]}. "
+        f"The top scorer was {top_scorer['PLAYER_NAME']} from {top_scorer['TEAM_ABBREVIATION']} "
         f"with {top_scorer['PTS']} points."
     )
 
