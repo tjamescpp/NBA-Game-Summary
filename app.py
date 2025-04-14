@@ -17,7 +17,7 @@ client = OpenAI()
 
 app = Flask(__name__)
 
-timeout = 60
+timeout = 120
 
 
 @app.route('/')
