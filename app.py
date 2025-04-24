@@ -7,12 +7,13 @@ import os
 from dotenv import load_dotenv
 import pandas as pd
 import pytz
+import requests
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv(override=True)
 
 # Access the API key
-openai_api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI()
 
 app = Flask(__name__)
@@ -107,7 +108,7 @@ def boxscore(game_id):
     summary = None
 
     if action == 'summarize':
-        # Generate the game summary (replace with your logic)
+        # Generate the game summary
         summary = generate_recap(game_id)
 
     return render_template('boxscore.html',
@@ -358,21 +359,52 @@ def create_game_recap(boxscore_data, play_by_play_data):
 
     # Combine box score and play-by-play summaries into the final prompt
     prompt = (
+        "Give a detailed summary of the game based on the following information:\n\n"
+        f"Box Score Summary:\n"
         f"{boxscore_summary}\n\n"
         "Here are some key moments from the game:\n"
         f"{key_moments_summary}\n\n"
-        "Based on the above information, generate a detailed and engaging summary of the game as a bullet point list, highlighting key plays, turning points, and standout performances."
-        "If the score was close, describe big plays from the final 5 minutes of the game."
+        "Based on the given information, generate a detailed and engaging summary of the game, highlighting key plays, turning points, and standout player performances."
+        "Mention players who had the highest stats, including points, rebounds, and assists."
+        "Provide a brief overview of each quarter, particularly focusing on the fourth quarter."
+        "Describe big plays from the final 5 minutes of the game."
+        "The summary should be no longer than 200 words, and end with a complete sentence."
     )
 
     # 3. Call the OpenAI API with the formatted prompt
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4.1",
         messages=[{"role": "system", "content": "You are an assistant that summarizes NBA games."},
                   {"role": "user", "content": prompt}],
         max_tokens=300,
         temperature=0.7
     )
+
+    # headers = {
+    #     "Authorization": f"Bearer {api_key}",
+    #     "Content-Type": "application/json"
+    # }
+
+    # print(f"API Key loaded: {api_key is not None}")
+
+    # data = {
+    #     "model": "gpt-4",
+    #     "messages": [{"role": "system", "content": "You are an assistant that summarizes NBA games."},
+    #                  {"role": "user", "content": prompt}],
+    #     "temperature": 0.7,
+    #     "max_tokens": 300,
+    # }
+
+    # response = requests.post(
+    #     "https://api.openai.com/v1/chat/completions", headers=headers, json=data)
+
+    # # Parse the JSON response
+    # response_json = response.json()
+
+    # # Extract the message content
+    # summary = response_json['choices'][0]['message']['content']
+
+    # print(summary)
 
     # Get the summary from the response
     summary = response.choices[0].message.content
