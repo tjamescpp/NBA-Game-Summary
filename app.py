@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import pandas as pd
 import pytz
 import requests
+from nba_api.stats.library.http import NBAStatsHTTP
 
 # Load environment variables from .env file
 load_dotenv(override=True)
@@ -18,7 +19,19 @@ client = OpenAI()
 
 app = Flask(__name__)
 
-timeout = 120
+timeout = 10
+
+NBAStatsHTTP._NBAStatsHTTP__headers = {
+    'User-Agent': 'Mozilla/5.0',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Referer': 'https://www.nba.com/',
+    'Origin': 'https://www.nba.com',
+    'Connection': 'keep-alive',
+    'Host': 'stats.nba.com',
+    'x-nba-stats-origin': 'stats',
+    'x-nba-stats-token': 'true',
+}
 
 
 @app.route('/')
@@ -377,7 +390,7 @@ def create_game_recap(boxscore_data, play_by_play_data):
         messages=[{"role": "system", "content": "You are an assistant that summarizes NBA games."},
                   {"role": "user", "content": prompt}],
         max_tokens=300,
-        temperature=0.7
+        temperature=0.7,
     )
 
     # headers = {
