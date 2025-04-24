@@ -1,5 +1,5 @@
 flask
-nba-api
+nba_api
 openai
 datetime
 python-dateutil
