@@ -19,7 +19,7 @@ client = OpenAI()
 
 app = Flask(__name__)
 
-timeout = 10
+timeout = 30
 
 NBAStatsHTTP._NBAStatsHTTP__headers = {
     'User-Agent': 'Mozilla/5.0',
